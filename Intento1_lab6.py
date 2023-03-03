@@ -24,6 +24,10 @@ def descenso_de_gradiente_v1(f_x, x, E: float, step_size: float, max_nit: int) -
     grad_x_k = gradiente.subs([(x1, x_k[0]), (x2, x_k[1])])
 
     while i < max_nit:
+        sol_matrix.append([])
+        sol_matrix[i].append(x_k[0])
+        sol_matrix[i].append(x_k[1])
+        sol_matrix[i].append(f_x.subs([(x1, x_k[0]), (x2, x_k[1])]))
 
         # descenso de gradiente
         grad_x_k = gradiente.subs([(x1, x_k[0]), (x2, x_k[1])])
@@ -35,12 +39,8 @@ def descenso_de_gradiente_v1(f_x, x, E: float, step_size: float, max_nit: int) -
             converges = True
             break
 
-        sol_matrix.append([])
         converges = False
         x_k = x_n
-        sol_matrix[i].append(x_k[0])
-        sol_matrix[i].append(x_k[1])
-        sol_matrix[i].append(f_x.subs([(x1, x_k[0]), (x2, x_k[1])]))
         i += 1
 
     if not converges:
