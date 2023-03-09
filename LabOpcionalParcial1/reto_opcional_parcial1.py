@@ -7,10 +7,9 @@ print("Mínimo de la función", func.minimum())
 
 # Dado un punto x0, func permite evaluar la función objetivo en x0
 x0 = np.array([5.0, 5.0, 5.0])
-f = func
 
 
-def numeric_gradient(xi, f, e=0.0000000000001):
+def numeric_gradient(xi, f, e=0.000001):
 
     gradient_result = np.zeros(len(xi))
 
@@ -22,7 +21,7 @@ def numeric_gradient(xi, f, e=0.0000000000001):
     return gradient_result
 
 
-print("Gradiente incial:", numeric_gradient(x0, f))
+print("Gradiente incial:", numeric_gradient(x0, func))
 
 
 def gradient_descent(f, numeric_gradient_func, xi, n_max=500):
@@ -52,16 +51,22 @@ def gradient_descent(f, numeric_gradient_func, xi, n_max=500):
                     stop = True
                 else:
                     xk = np.copy(xk1)
+                    n += 1
 
             if float(f(xk)) < min_f:
                 min_f = float(f(xk))
                 x_min = np.copy(xk)
+                best_alpha = alpha
+                best_epsilon = e
+                best_n = n
 
-    return f"\nx_init = {xi}\nalpha = {alpha}\ne = {e}\nx = {x_min}\nmin_f = {min_f}"
+    return best_alpha, best_epsilon, x_min, min_f, best_n
 
 
 x0_values = [-5, 5]
 x0 = np.zeros(3)
+results = {}
+min_f = None
 
 for i in range(len(x0_values)):
     x0[0] = x0_values[i]
@@ -69,4 +74,17 @@ for i in range(len(x0_values)):
         x0[1] = x0_values[j]
         for k in range(len(x0_values)):
             x0[2] = x0_values[k]
-            print(gradient_descent(f, numeric_gradient, x0))
+
+            a, e, x_min, min_f, n = gradient_descent(
+                func, numeric_gradient, x0)
+            results[min_f] = (a, e, x_min, n, x0)
+            print(
+                f"\nx_init = {x0}\nalpha = {a}\ne = {e}\nx = {x_min}\nmin_f = {min_f}\nn = {n}")
+
+for key in results:
+    if key < min_f:
+        min_f = key
+
+a, e, x_min, n, x0 = results[min_f]
+print(
+    f"\nLA MEJOR APROXIMACIÓN:\nx_init = {x0}\nalpha = {a}\ne = {e}\nx = {x_min}\nmin_f = {min_f}\nn = {n}")
