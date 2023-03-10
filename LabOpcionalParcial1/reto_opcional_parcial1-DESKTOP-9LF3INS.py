@@ -1,5 +1,6 @@
 import benchmark_functions as bf
 import numpy as np
+from tabulate import tabulate
 
 # func es el objeto creado con la funcion a minimizar
 func = bf.StyblinskiTang(n_dimensions=3)
@@ -31,12 +32,10 @@ def gradient_descent(f, numeric_gradient_func, xi, n_max=500):
     min_f = float(f(xi))
     x_min = np.copy(xi)
 
-    # se prueban varios alphas y epsilons para encontrar el minimizador
     for i in range(1, 10):
         alpha = i/100
         for j in range(1, 10):
 
-            # algoritmo de descenso del gradiente
             xk = np.copy(xi)
             e = j/10
             n = 0
@@ -55,8 +54,6 @@ def gradient_descent(f, numeric_gradient_func, xi, n_max=500):
                     xk = np.copy(xk1)
                     n += 1
 
-            # revisar si el punto encontrado por el algoritmo es el mejor para la condición inicial dada
-            # actualizar los parámetros que obtuvieron el resultado
             if float(f(xk)) < min_f:
                 min_f = float(f(xk))
                 x_min = np.copy(xk)
@@ -64,12 +61,15 @@ def gradient_descent(f, numeric_gradient_func, xi, n_max=500):
                 best_epsilon = e
                 best_n = n
 
-    return best_alpha, best_epsilon, x_min, min_f, best_n
+    return best_n, best_alpha, best_epsilon, x_min, min_f
 
 
 x0_values = [-5, 5]
 x0 = np.zeros(3)
-results = {}
+dict_for_best_approx = {}
+table_headers = ['x0', 'n_iteraciones', 'alpha',
+                 'epsilon', 'x_min: mínimo local', 'f(x_min)']
+list_results = []
 min_f = None
 
 # probar el algoritmo para cada condición inicial y guardar información de cada resultado
@@ -79,18 +79,19 @@ for i in range(len(x0_values)):
         x0[1] = x0_values[j]
         for k in range(len(x0_values)):
             x0[2] = x0_values[k]
+            n, a, e, x_min, min_f = gradient_descent(
+                func, numeric_gradient, np.copy(x0))
+            dict_for_best_approx[min_f] = (np.copy(x0), n, a, e, x_min)
+            list_results.append([np.copy(x0), n, a, e, x_min, min_f])
 
-            a, e, x_min, min_f, n = gradient_descent(
-                func, numeric_gradient, x0)
-            results[min_f] = (a, e, x_min, n, x0)
-            print(
-                f"\nx_init = {x0}\nalpha = {a}\ne = {e}\nx = {x_min}\nmin_f = {min_f}\nn = {n}")
+print(tabulate(list_results, headers=table_headers, tablefmt="pipe",
+      maxcolwidths=50, floatfmt=(None, None, '.2f', '.2f', None, '.10f')))
 
 # encontrar mejor aproximación
-for key in results:
+for key in dict_for_best_approx:
     if key < min_f:
         min_f = key
 
-a, e, x_min, n, x0 = results[min_f]
+x_init, n, a, e, x_min = dict_for_best_approx[min_f]
 print(
-    f"\nLA MEJOR APROXIMACIÓN:\nx_init = {x0}\nalpha = {a}\ne = {e}\nx = {x_min}\nmin_f = {min_f}\nn = {n}")
+    f"\nCANDIDATO A MINIMIZADOR GLOBAL:\nx_init = {x_init}\nalpha = {a}\ne = {e}\nx = {x_min}\nmin_f = {min_f}\nn = {n}")
