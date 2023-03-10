@@ -31,10 +31,12 @@ def gradient_descent(f, numeric_gradient_func, xi, n_max=500):
     min_f = float(f(xi))
     x_min = np.copy(xi)
 
+    # se prueban varios alphas y epsilons para encontrar el minimizador
     for i in range(1, 10):
         alpha = i/100
         for j in range(1, 10):
 
+            # algoritmo de descenso del gradiente
             xk = np.copy(xi)
             e = j/10
             n = 0
@@ -53,6 +55,8 @@ def gradient_descent(f, numeric_gradient_func, xi, n_max=500):
                     xk = np.copy(xk1)
                     n += 1
 
+            # revisar si el punto encontrado por el algoritmo es el mejor para la condición inicial dada
+            # actualizar los parámetros que obtuvieron el resultado
             if float(f(xk)) < min_f:
                 min_f = float(f(xk))
                 x_min = np.copy(xk)
@@ -68,6 +72,7 @@ x0 = np.zeros(3)
 results = {}
 min_f = None
 
+# probar el algoritmo para cada condición inicial y guardar información de cada resultado
 for i in range(len(x0_values)):
     x0[0] = x0_values[i]
     for j in range(len(x0_values)):
@@ -81,6 +86,7 @@ for i in range(len(x0_values)):
             print(
                 f"\nx_init = {x0}\nalpha = {a}\ne = {e}\nx = {x_min}\nmin_f = {min_f}\nn = {n}")
 
+# encontrar mejor aproximación
 for key in results:
     if key < min_f:
         min_f = key
